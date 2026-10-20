@@ -1,0 +1,32 @@
+name: Daily cycle
+
+on:
+  schedule:
+    # 01:30 UTC every day. The app also decides internally whether the run is
+    # due in the operator's timezone (docs/06-tech-stack-roadmap.md).
+    - cron: "30 1 * * *"
+  workflow_dispatch:
+    inputs:
+      run_date:
+        description: "Optional run date (YYYY-MM-DD), defaults to today"
+        required: false
+
+jobs:
+  run-daily-cycle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger the daily cycle
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          SYSTEM_CRON_SECRET: ${{ secrets.SYSTEM_CRON_SECRET }}
+        run: |
+          if [ -z "$APP_URL" ] || [ -z "$SYSTEM_CRON_SECRET" ]; then
+            echo "APP_URL and SYSTEM_CRON_SECRET must be configured as repository secrets."
+            exit 1
+          fi
+
+          curl --fail --silent --show-error \
+            --request POST \
+            --header "x-system-secret: ${SYSTEM_CRON_SECRET}" \
+            --header "Content-Type: application/json" \
+            ${APP_URL}/api/system/run-daily-cycle

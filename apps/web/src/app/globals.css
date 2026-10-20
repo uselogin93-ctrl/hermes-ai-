@@ -1,0 +1,179 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ------------------------------------------------------------------ *
+ * Design tokens
+ *
+ * Palette rationale: a warm limestone neutral base with a single clay
+ * accent. Deliberately avoids the purple/black "AI" default, neon, and
+ * pure #FFFFFF backgrounds (see docs/12-ui-standards-checklist.md).
+ * ------------------------------------------------------------------ */
+
+:root {
+  --background: #f3f1ec;
+  --surface: #fbfaf6;
+  --surface-muted: #ece9e1;
+  --surface-sunken: #e7e3d9;
+  --border: #dfdacd;
+  --border-strong: #c9c3b2;
+  --foreground: #1a1916;
+  --muted-foreground: #6b675c;
+
+  --accent: #a8472a;
+  --accent-hover: #8e3a21;
+  --accent-foreground: #fbf7f2;
+  --accent-subtle: #f2e2d9;
+
+  --success: #3c7a50;
+  --success-subtle: #e0ece3;
+  --warning: #96690f;
+  --warning-subtle: #f3e8d3;
+  --danger: #a5382e;
+  --danger-subtle: #f4dfdc;
+  --info: #2c5f84;
+  --info-subtle: #dee8f0;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  --shadow-raised: 0 1px 2px rgb(26 25 22 / 0.06);
+  --shadow-overlay: 0 12px 28px -12px rgb(26 25 22 / 0.28);
+}
+
+.dark {
+  --background: #131311;
+  --surface: #1b1b18;
+  --surface-muted: #232320;
+  --surface-sunken: #0e0e0d;
+  --border: #2f2e2a;
+  --border-strong: #46443b;
+  --foreground: #ede9e0;
+  --muted-foreground: #9b968a;
+
+  --accent: #d07750;
+  --accent-hover: #e08b62;
+  --accent-foreground: #1a1310;
+  --accent-subtle: #2a1f19;
+
+  --success: #63a97c;
+  --success-subtle: #16241b;
+  --warning: #c79a46;
+  --warning-subtle: #262014;
+  --danger: #d06a5e;
+  --danger-subtle: #2a1715;
+  --info: #6fa3c9;
+  --info-subtle: #16212a;
+
+  --shadow-raised: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-overlay: 0 12px 28px -12px rgb(0 0 0 / 0.65);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-subtle: var(--accent-subtle);
+
+  --color-success: var(--success);
+  --color-success-subtle: var(--success-subtle);
+  --color-warning: var(--warning);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-danger: var(--danger);
+  --color-danger-subtle: var(--danger-subtle);
+  --color-info: var(--info);
+  --color-info-subtle: var(--info-subtle);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+
+  --shadow-raised: var(--shadow-raised);
+  --shadow-overlay: var(--shadow-overlay);
+
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --spacing: 0.25rem;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv05" 1, "ss01" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--accent-subtle);
+    color: var(--foreground);
+  }
+
+  /* Consistent, themed scrollbars (checklist: custom scrollbar styling). */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--border-strong);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--muted-foreground);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Tabular figures for metrics, tables and timestamps. */
+  .numeric {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+}

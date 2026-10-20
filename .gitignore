@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+
+# Production
+build/
+dist/
+
+# Local database (embedded Postgres)
+.data/
+*.sqlite
+*.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Test output
+coverage/
+playwright-report/
+test-results/
+screenshots/
+
+# Editor and OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.log
+
+# TypeScript incremental build info
+*.tsbuildinfo

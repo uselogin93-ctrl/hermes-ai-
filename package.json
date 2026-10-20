@@ -1,0 +1,27 @@
+{
+  "name": "careerpulse-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CareerPulse AI — personal career-automation platform that turns GitHub + Google Drive activity into reviewed LinkedIn posts.",
+  "packageManager": "pnpm@10.15.0",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @careerpulse/web dev",
+    "build": "pnpm --filter @careerpulse/web build",
+    "start": "pnpm --filter @careerpulse/web start",
+    "lint": "pnpm --filter @careerpulse/web lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm --filter @careerpulse/web test",
+    "test:e2e": "pnpm --filter @careerpulse/web test:e2e",
+    "db:generate": "pnpm --filter @careerpulse/web db:generate",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json,css}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "unrs-resolver"]
+  }
+}

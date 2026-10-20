@@ -1,0 +1,51 @@
+{
+  "chain": [
+    "gemini-free",
+    "groq-free",
+    "openrouter-free",
+    "github-models-free",
+    "ollama-local"
+  ],
+  "providers": {
+    "gemini-free": {
+      "type": "gemini",
+      "model": "gemini-2.0-flash",
+      "envKey": "GEMINI_API_KEY",
+      "timeoutMs": 45000
+    },
+    "groq-free": {
+      "type": "openai-compatible",
+      "model": "llama-3.3-70b-versatile",
+      "envKey": "GROQ_API_KEY",
+      "baseUrl": "https://api.groq.com/openai/v1",
+      "timeoutMs": 45000
+    },
+    "openrouter-free": {
+      "type": "openai-compatible",
+      "model": "meta-llama/llama-3.3-70b-instruct:free",
+      "envKey": "OPENROUTER_API_KEY",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "timeoutMs": 60000
+    },
+    "github-models-free": {
+      "type": "openai-compatible",
+      "model": "openai/gpt-4o-mini",
+      "envKey": "GITHUB_MODELS_TOKEN",
+      "baseUrl": "https://models.github.ai/inference",
+      "timeoutMs": 60000
+    },
+    "ollama-local": {
+      "type": "ollama",
+      "model": "llama3.1:8b",
+      "envKey": "",
+      "baseUrl": "http://127.0.0.1:11434",
+      "timeoutMs": 90000
+    },
+    "demo-local": {
+      "type": "demo",
+      "model": "deterministic-offline",
+      "envKey": "",
+      "timeoutMs": 5000
+    }
+  }
+}
