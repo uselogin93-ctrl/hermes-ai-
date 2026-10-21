@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, lte } from "drizzle-orm";
 import type { Db } from "@/lib/db";
 import { connections, drafts, posts } from "@/lib/db/schema";
 import { decryptSecret } from "@/lib/security/crypto";
@@ -115,6 +115,54 @@ export async function scheduleDraft(db: Db, draftId: string, scheduledFor: Date)
     .where(eq(drafts.id, draftId))
     .returning();
   return Boolean(row);
+}
+
+export type ScheduledSweepOutcome = {
+  checked: number;
+  published: string[];
+  failed: Array<{ draftId: string; message: string }>;
+};
+
+/**
+ * Publishes every draft whose `scheduledFor` time has arrived.
+ *
+ * Must be called periodically (the cron entry point calls this right
+ * alongside `runDailyCycle`) — `scheduleDraft` only records the intent to
+ * publish later; this is what actually carries it out.
+ */
+export async function publishDueScheduledDrafts(db: Db): Promise<ScheduledSweepOutcome> {
+  const now = new Date();
+  const due = await db
+    .select()
+    .from(drafts)
+    .where(and(eq(drafts.status, "scheduled"), lte(drafts.scheduledFor, now)));
+
+  const outcome: ScheduledSweepOutcome = { checked: due.length, published: [], failed: [] };
+
+  for (const draft of due) {
+    try {
+      const result = await publishDraftToLinkedIn(db, draft.id);
+      if (result.published) {
+        outcome.published.push(draft.id);
+        await notifyPublished(db, draft.id, result.url ?? null);
+      } else {
+        // LinkedIn not connected / publish declined: don't retry forever as
+        // "scheduled" — surface it as failed so it isn't silently stuck.
+        await setDraftStatus(db, draft.id, "approved");
+        outcome.failed.push({ draftId: draft.id, message: result.message });
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Scheduled publish failed";
+      outcome.failed.push({ draftId: draft.id, message });
+      await writeAudit(db, AUDIT_EVENTS.providerFailed, {
+        provider: "linkedin",
+        draft_id: draft.id,
+        error: message,
+      });
+    }
+  }
+
+  return outcome;
 }
 
 /** Notifies the user that a draft was approved and published. */

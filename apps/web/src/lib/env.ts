@@ -68,6 +68,36 @@ export const env = {
 
 export type Env = typeof env;
 
+/**
+ * Fail fast in production if security-critical secrets were left at their
+ * insecure development defaults. These sign session cookies / OAuth state
+ * (sessionSecret) and encrypt every stored OAuth token at rest
+ * (tokenEncryptionKey) — both are hardcoded, publicly-known strings in the
+ * shipped source, so running with them in production allows session
+ * forgery and makes "encrypted" tokens trivially decryptable.
+ */
+if (process.env.NODE_ENV === "production") {
+  const insecureDefaults: Array<[string, string]> = [
+    ["APP_SESSION_SECRET", env.sessionSecret],
+    ["TOKEN_ENCRYPTION_KEY", env.tokenEncryptionKey],
+  ];
+  const stillDefault = insecureDefaults.filter(
+    ([, value]) => value === "dev-only-insecure-session-secret" || value === "dev-only-insecure-token-key",
+  );
+  if (stillDefault.length > 0) {
+    throw new Error(
+      `Refusing to start in production with insecure default secret(s): ${stillDefault
+        .map(([name]) => name)
+        .join(", ")}. Set real, random values for these environment variables.`,
+    );
+  }
+  if (env.adminPassword === "careerpulse") {
+    throw new Error(
+      "Refusing to start in production with the default APP_ADMIN_PASSWORD. Set a strong, unique value.",
+    );
+  }
+}
+
 /** True when the app runs without any real Postgres instance (embedded PGlite). */
 export const isEmbeddedDatabase = !env.databaseUrl;
 

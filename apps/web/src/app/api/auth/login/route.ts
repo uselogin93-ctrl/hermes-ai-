@@ -34,7 +34,12 @@ export async function POST(request: Request) {
     let [user] = await db.select().from(appUsers).where(eq(appUsers.email, email)).limit(1);
 
     if (!user) {
-      if (email !== env.adminEmail) {
+      // The admin account is provisioned on first successful login, but only
+      // ever with the password configured in the environment (APP_ADMIN_PASSWORD)
+      // — never with whatever the caller happened to submit. Otherwise the
+      // first person to POST here with the (predictable) admin email would
+      // permanently set the admin password to a value of their own choosing.
+      if (email !== env.adminEmail || password !== env.adminPassword) {
         throw new ApiError("UNAUTHORIZED", "Those credentials were not recognised.");
       }
       const [created] = await db
@@ -42,7 +47,7 @@ export async function POST(request: Request) {
         .values({
           email,
           name: env.adminName,
-          passwordHash: await hashPassword(password || env.adminPassword),
+          passwordHash: await hashPassword(env.adminPassword),
         })
         .returning();
       user = created;

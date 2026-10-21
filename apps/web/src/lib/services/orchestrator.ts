@@ -1,4 +1,4 @@
-import { desc, eq, gte } from "drizzle-orm";
+import { and, desc, eq, gte, ne } from "drizzle-orm";
 import type { Db } from "@/lib/db";
 import { dailyRuns } from "@/lib/db/schema";
 import type { RunStatus } from "@careerpulse/shared-types";
@@ -75,7 +75,7 @@ export async function runDailyCycle(
   try {
     const since =
       options.since ??
-      (await resolveSinceWindow(db, runDate, settings.timezone));
+      (await resolveSinceWindow(db, runDate, settings.timezone, runId));
 
     const scan = await scanActivity(db, since);
 
@@ -203,11 +203,16 @@ export async function runDailyCycle(
 }
 
 /** Uses the previous run as the window start, falling back to the last 24h. */
-async function resolveSinceWindow(db: Db, runDate: string, timeZone: string): Promise<Date> {
+async function resolveSinceWindow(
+  db: Db,
+  runDate: string,
+  timeZone: string,
+  currentRunId: string,
+): Promise<Date> {
   const [lastRun] = await db
     .select()
     .from(dailyRuns)
-    .where(gte(dailyRuns.runDate, "1970-01-01"))
+    .where(and(gte(dailyRuns.runDate, "1970-01-01"), ne(dailyRuns.id, currentRunId)))
     .orderBy(desc(dailyRuns.startedAt))
     .limit(1);
 
